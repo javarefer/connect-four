@@ -335,17 +335,13 @@ class App extends React.Component{
           <button style={buttonStyle} onClick={this.newGame}><b>New Game</b></button>
           <br/>
           <br/>
-          <h2 style={playStyle}>{this.state.playerColor[this.state.currentPlayer-1]}'s turn...</h2>
-          <h2 style={resultStyle}>{this.state.playerColor[this.state.winner-1]} is a winner!!!</h2>
-          <div>
-          {
-            this.state.board[0].map((item, index) => ((this.state.currentPlayer === 1)?<img onClick={() => this.play(index + 1)} className={playBarClass} src={blue}/>:<img  onClick={() => this.play(index + 1)} className={playBarClass} src={red}/>))
-          }
-          </div>
+          <h2 style={playStyle}>{(this.state.currentPlayer === 1)?<img className="App-currentPlay" src={blue}/>:(this.state.currentPlayer === 2)?<img className="App-currentPlay" src={red}/>:<b/>} {this.state.playerColor[this.state.currentPlayer-1]}'s turn...</h2>
+          <h2 style={resultStyle}>{(this.state.currentPlayer === 1)?<img className="App-winner" src={blue}/>:(this.state.currentPlayer === 2)?<img className="App-winner" src={red}/>:<b/>} {this.state.playerColor[this.state.winner-1]} is a winner!!!</h2>
           {
             this.state.board.map((innerArray) => (
                 <div >
-                  {innerArray.map((item) => (item === 0)?<img src={empty}/>:(item === 1)?<img src={blueIn}/>:<img src={redIn}/>)
+                  {
+                    innerArray.map((item, index) => (item === 0)?<img style={buttonStyle} onClick={() => this.play(index + 1)} src={empty}/>:(item === 1)?<img style={buttonStyle} onClick={() => this.play(index + 1)} src={blueIn}/>:<img style={buttonStyle} onClick={() => this.play(index + 1)} src={redIn}/>)
                   }
                 </div>
               ))

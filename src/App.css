@@ -44,6 +44,11 @@
 .App-winner{
   opacity: 1;
   animation: App-logo-spin infinite 6s linear;
+  vertical-align: middle;
+}
+
+.App-currentPlay{
+  vertical-align: middle;
 }
 
 @keyframes App-logo-spin {
