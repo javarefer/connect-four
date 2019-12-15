@@ -69,8 +69,7 @@ class App extends React.Component{
     this.setState({board: board});
 
     if(!columnBlocked) {
-      this.checkVictoryForPlay(playRow, playCol);
-      if (!this.checkVictoryForPlay()) {
+      if (!this.checkVictoryForPlay(playRow, playCol)) {
         this.setCurrentPlayer();
       }
     }
@@ -153,7 +152,7 @@ class App extends React.Component{
   checkVictoryLeftDia(playRow, playCol) {
     let count = 1;
 
-    //check left side
+    //check left-top side
     for (let c=playCol-1, r=playRow-1; (c>=0 && r>=0); c--, r--) {
       let value = this.state.board[r][c];
 
@@ -166,7 +165,7 @@ class App extends React.Component{
       }
     }
 
-    //check right side
+    //check right-bottom side
     for (let c=playCol+1, r=playRow+1; (c<this.state.width && r<this.state.height); c++, r++) {
       let value = this.state.board[r][c];
 
@@ -185,7 +184,7 @@ class App extends React.Component{
   checkVictoryRightDia(playRow, playCol) {
     let count = 1;
 
-    //check left side
+    //check right-top side
     for (let c=playCol+1, r=playRow-1; (c<this.state.width && r>=0); c++, r--) {
       let value = this.state.board[r][c];
 
@@ -198,8 +197,8 @@ class App extends React.Component{
       }
     }
 
-    //check right side
-    for (let c=playCol-1, r=playRow+1; (c>=0 && r<this.state.height); c++, r++) {
+    //check left-bottom side
+    for (let c=playCol-1, r=playRow+1; (c>=0 && r<this.state.height); c--, r++) {
       let value = this.state.board[r][c];
 
       if ((value === 0) || ((value >0) && (this.state.currentPlayer !== value))) {
@@ -328,6 +327,8 @@ class App extends React.Component{
     var resultStyle = (this.state.winner === 0)? {display: 'none'} : {};
     var playStyle = (this.state.winner === 0)? {} : {display: 'none'};
     var buttonStyle = {cursor: 'pointer'};
+    var playBarClass = (this.state.winner === 0) ? 'App-current' : 'App-winner';
+
     return (
         <div className="App">
           <br/>
@@ -335,9 +336,10 @@ class App extends React.Component{
           <br/>
           <br/>
           <h2 style={playStyle}>{this.state.playerColor[this.state.currentPlayer-1]}'s turn...</h2>
-          <div style={playStyle}>
+          <h2 style={resultStyle}>{this.state.playerColor[this.state.winner-1]} is a winner!!!</h2>
+          <div>
           {
-            this.state.board[0].map((item, index) => ((this.state.currentPlayer === 1)?<img onClick={() => this.play(index + 1)} className="App-current" src={blue}/>:<img  onClick={() => this.play(index + 1)} className="App-current" src={red}/>))
+            this.state.board[0].map((item, index) => ((this.state.currentPlayer === 1)?<img onClick={() => this.play(index + 1)} className={playBarClass} src={blue}/>:<img  onClick={() => this.play(index + 1)} className={playBarClass} src={red}/>))
           }
           </div>
           {
@@ -348,7 +350,6 @@ class App extends React.Component{
                 </div>
               ))
           }
-          <h1 style={resultStyle}>Player {this.state.playerColor[this.state.winner-1]} is a winner!!!</h1>
         </div>
     );
   }

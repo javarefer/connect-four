@@ -29,7 +29,7 @@
 }
 
 .App-current{
-  opacity: 0.25;
+  opacity: 0.35;
   cursor: pointer;
 }
 
@@ -37,6 +37,14 @@
   opacity: 1;
 }
 
+.App-current:hover{
+  opacity: 0.50;
+}
+
+.App-winner{
+  opacity: 1;
+  animation: App-logo-spin infinite 6s linear;
+}
 
 @keyframes App-logo-spin {
   from {
