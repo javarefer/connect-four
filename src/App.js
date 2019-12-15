@@ -331,7 +331,7 @@ class App extends React.Component{
     return (
         <div className="App">
           <br/>
-          <button style={buttonStyle} onClick={this.newGame}><h4><b>New Game</b></h4></button>
+          <button style={buttonStyle} onClick={this.newGame}><b>New Game</b></button>
           <br/>
           <br/>
           <h2 style={playStyle}>{this.state.playerColor[this.state.currentPlayer-1]}'s turn...</h2>

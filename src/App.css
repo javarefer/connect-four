@@ -33,7 +33,7 @@
   cursor: pointer;
 }
 
-.App-current:hover{
+.App-current:active:hover{
   opacity: 1;
 }
 
