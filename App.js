@@ -337,7 +337,7 @@ class App extends React.Component{
           <br/>
           <br/>
           <h2 style={playStyle}>{(this.state.currentPlayer === 1)?<img className="App-currentPlay" src={blue}/>:(this.state.currentPlayer === 2)?<img className="App-currentPlay" src={red}/>:<b/>} {this.state.playerColor[this.state.currentPlayer-1]}'s turn...</h2>
-          <h2 style={resultStyle}>{(this.state.currentPlayer === 1)?<img className="App-winner" src={blue}/>:(this.state.currentPlayer === 2)?<img className="App-winner" src={red}/>:<b/>} {this.state.playerColor[this.state.winner-1]} is a winner!!!</h2>
+          <h2 style={resultStyle}>{(this.state.currentPlayer === 1)?<img className="App-winner" src={blue}/>:(this.state.currentPlayer === 2)?<img className="App-winner" src={red}/>:<b/>} {this.state.playerColor[this.state.winner-1]} wins!!!</h2>
           {
             this.state.board.map((innerArray) => (
                 <div >
