@@ -327,6 +327,7 @@ class App extends React.Component{
     var resultStyle = (this.state.winner === 0)? {display: 'none'} : {};
     var playStyle = (this.state.winner === 0)? {} : {display: 'none'};
     var buttonStyle = {cursor: 'pointer'};
+    var playBoardStyle = (this.state.winner === 0)? {cursor: 'pointer'} : {cursor: 'default' , opacity: '0.50'};
     var playBarClass = (this.state.winner === 0) ? 'App-current' : 'App-winner';
 
     return (
@@ -336,12 +337,12 @@ class App extends React.Component{
           <br/>
           <br/>
           <h2 style={playStyle}>{(this.state.currentPlayer === 1)?<img className="App-currentPlay" src={blue}/>:(this.state.currentPlayer === 2)?<img className="App-currentPlay" src={red}/>:<b/>} {this.state.playerColor[this.state.currentPlayer-1]}'s turn...</h2>
-          <h2 style={resultStyle}>{(this.state.currentPlayer === 1)?<img className="App-winner" src={blue}/>:(this.state.currentPlayer === 2)?<img className="App-winner" src={red}/>:<b/>} {this.state.playerColor[this.state.winner-1]} is a winner!!!</h2>
+          <h2 style={resultStyle}>{(this.state.currentPlayer === 1)?<img className="App-winner" src={blue}/>:(this.state.currentPlayer === 2)?<img className="App-winner" src={red}/>:<b/>} {this.state.playerColor[this.state.winner-1]} wins!!!</h2>
           {
             this.state.board.map((innerArray) => (
                 <div >
                   {
-                    innerArray.map((item, index) => (item === 0)?<img style={buttonStyle} onClick={() => this.play(index + 1)} src={empty}/>:(item === 1)?<img style={buttonStyle} onClick={() => this.play(index + 1)} src={blueIn}/>:<img style={buttonStyle} onClick={() => this.play(index + 1)} src={redIn}/>)
+                    innerArray.map((item, index) => (item === 0)?<img style={playBoardStyle} onClick={() => this.play(index + 1)} src={empty}/>:(item === 1)?<img style={playBoardStyle} onClick={() => this.play(index + 1)} src={blueIn}/>:<img style={playBoardStyle} onClick={() => this.play(index + 1)} src={redIn}/>)
                   }
                 </div>
               ))
