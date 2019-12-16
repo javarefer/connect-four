@@ -81,7 +81,7 @@ class App extends React.Component{
     else
       this.setState({currentPlayer : 1});
 
-    console.log( this.state.currentPlayer);
+    //console.log( this.state.currentPlayer);
   }
 
   checkVictoryForPlay (playRow, playCol) {
@@ -92,6 +92,7 @@ class App extends React.Component{
         this.checkVictoryRightDia(playRow, playCol)) {
 
       this.setState({winner : this.state.currentPlayer});
+      this.printVictory();
       return true;
     }
 
@@ -222,7 +223,7 @@ class App extends React.Component{
     for (let r=0; r<this.state.height; r++) {
       for (let c=0; c<this.state.width; c++) {
         let value = this.state.board[r][c];
-        console.log(value + " " + count + " " + currentPlayer);
+        //console.log(value + " " + count + " " + currentPlayer);
         if (value > 0) {
           if (currentPlayer === value){
             count++;
@@ -256,7 +257,7 @@ class App extends React.Component{
     for (var c=0; c<this.state.width; c++) {
       for (var r=0; r<this.state.height; r++) {
         var value = this.state.board[r][c];
-        console.log(value + " " + count + " " + currentPlayer);
+        //console.log(value + " " + count + " " + currentPlayer);
         if (value > 0) {
           if (currentPlayer === value){
             count++;
@@ -315,7 +316,7 @@ class App extends React.Component{
 
   newGame = () => {
     this.setState({winner : 0});
-    var board = new Array();
+    var board = [];
     for(var i= 0; i<this.state.height; i++) {
       board.push(new Array(this.state.width).fill(0));
     }
@@ -328,7 +329,6 @@ class App extends React.Component{
     var playStyle = (this.state.winner === 0)? {} : {display: 'none'};
     var buttonStyle = {cursor: 'pointer'};
     var playBoardStyle = (this.state.winner === 0)? {cursor: 'pointer'} : {cursor: 'default' , opacity: '0.50'};
-    var playBarClass = (this.state.winner === 0) ? 'App-current' : 'App-winner';
 
     return (
         <div className="App">
@@ -336,13 +336,13 @@ class App extends React.Component{
           <button style={buttonStyle} onClick={this.newGame}><b>New Game</b></button>
           <br/>
           <br/>
-          <h2 style={playStyle}>{(this.state.currentPlayer === 1)?<img className="App-currentPlay" src={blue}/>:(this.state.currentPlayer === 2)?<img className="App-currentPlay" src={red}/>:<b/>} {this.state.playerColor[this.state.currentPlayer-1]}'s turn...</h2>
-          <h2 style={resultStyle}>{(this.state.currentPlayer === 1)?<img className="App-winner" src={blue}/>:(this.state.currentPlayer === 2)?<img className="App-winner" src={red}/>:<b/>} {this.state.playerColor[this.state.winner-1]} wins!!!</h2>
+          <h2 style={playStyle}>{(this.state.currentPlayer === 1)?<img alt=" " className="App-currentPlay" src={blue}/>:(this.state.currentPlayer === 2)?<img alt=" " className="App-currentPlay" src={red}/>:<b/>} {this.state.playerColor[this.state.currentPlayer-1]}'s turn...</h2>
+          <h2 style={resultStyle}>{(this.state.currentPlayer === 1)?<img alt=" " className="App-winner" src={blue}/>:(this.state.currentPlayer === 2)?<img alt=" " className="App-winner" src={red}/>:<b/>} {this.state.playerColor[this.state.winner-1]} wins!!!</h2>
           {
-            this.state.board.map((innerArray) => (
+            this.state.board.map((innerArray, mIndex) => (
                 <div >
                   {
-                    innerArray.map((item, index) => (item === 0)?<img style={playBoardStyle} onClick={() => this.play(index + 1)} src={empty}/>:(item === 1)?<img style={playBoardStyle} onClick={() => this.play(index + 1)} src={blueIn}/>:<img style={playBoardStyle} onClick={() => this.play(index + 1)} src={redIn}/>)
+                    innerArray.map((item, index) => (item === 0)?<img key={(mIndex.toString() + index.toString())} alt=" " style={playBoardStyle} onClick={() => this.play(index + 1)} src={empty}/>:(item === 1)?<img key={(mIndex.toString() + index.toString())}  alt=" " style={playBoardStyle} onClick={() => this.play(index + 1)} src={blueIn}/>:<img key={(mIndex.toString() + index.toString())}  alt=" " style={playBoardStyle} onClick={() => this.play(index + 1)} src={redIn}/>)
                   }
                 </div>
               ))
