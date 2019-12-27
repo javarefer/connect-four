@@ -116,7 +116,6 @@ class App extends React.Component{
    * @returns {boolean}
    */
   checkVictoryForPlay (playRow, playCol) {
-    console.log(playRow + " " + playCol);
     if(this.checkVictoryDown(playRow, playCol) ||
         this.checkVictorySide(playRow, playCol) ||
         this.checkVictoryLeftDia(playRow, playCol) ||
@@ -136,7 +135,6 @@ class App extends React.Component{
   }
 
   setConnectFour() {
-    console.log(winningCells);
     let board = this.state.board;
 
     for(let i=0; i<winningCells.length; i++) {
