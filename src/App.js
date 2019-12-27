@@ -1,3 +1,11 @@
+/**
+ * Connect Four Game
+ * Author: Rahul Sapkal (rahul@javareference.com)
+ * Copyright 2019
+ * ---------------------------------------------------
+ * This is a two player Connect Four Game
+ */
+
 import React from 'react';
 import red from './red.png';
 import blue from './blue.png';
@@ -6,6 +14,11 @@ import redIn from './redin.png';
 import empty from './empty.png';
 import './App.css';
 
+let winningCells = [];
+
+/**
+ * Connect Four Game App
+ */
 class App extends React.Component{
 
   constructor(props) {
@@ -20,11 +33,17 @@ class App extends React.Component{
       width: 7
     };
 
-    for(var i= 0; i<this.state.height; i++) {
+    for(let i= 0; i<this.state.height; i++) {
       this.state.board.push(new Array(this.state.width).fill(0));
     }
   }
 
+  /**
+   * This method is called when a player makes a play
+   *
+   * @param column
+   * @param player
+   */
   play(column, player) {
 
     if((this.state.winner > 0) || (column < 1)){
@@ -75,6 +94,10 @@ class App extends React.Component{
     }
   }
 
+  /**
+   * This method toggles the current player state after
+   * every play
+   */
   setCurrentPlayer() {
     if (this.state.currentPlayer === 1)
       this.setState({currentPlayer : 2});
@@ -84,251 +107,191 @@ class App extends React.Component{
     //console.log( this.state.currentPlayer);
   }
 
+  /**
+   * This function checks a winning scenario after
+   * every move
+   *
+   * @param playRow
+   * @param playCol
+   * @returns {boolean}
+   */
   checkVictoryForPlay (playRow, playCol) {
-
+    console.log(playRow + " " + playCol);
     if(this.checkVictoryDown(playRow, playCol) ||
         this.checkVictorySide(playRow, playCol) ||
         this.checkVictoryLeftDia(playRow, playCol) ||
         this.checkVictoryRightDia(playRow, playCol)) {
 
       this.setState({winner : this.state.currentPlayer});
-      this.printVictory();
+      console.log("Winner is " + this.state.winner);
+      this.setConnectFour();
       return true;
     }
 
     return false;
   }
 
-  checkVictoryDown(playRow, playCol) {
-    //check down
-    let count = 1;
+  resetWinningCells (playRow, playCol) {
+    winningCells = [{row: playRow, col: playCol}];
+  }
 
-    for (let r=playRow+1; r<this.state.height; r++) {
-      let value = this.state.board[r][playCol];
+  setConnectFour() {
+    console.log(winningCells);
+    let board = this.state.board;
 
-      if ((value === 0) || ((value >0) && (this.state.currentPlayer !== value))) {
-        break;
-      }
-      count++;
-      if (count === 4) {
-        return true;
-      }
+    for(let i=0; i<winningCells.length; i++) {
+      board[winningCells[i].row][winningCells[i].col] = 3;
     }
 
+    this.setState({board: board});
+  }
+
+  /**
+   * This method checks for connect four for given row and col.
+   * It returns false if it's not a connect four
+   * It returns true if it's a connect four
+   * It returns undefined if it's not sure whether it is a connect four yet
+   *
+   * @param playRow
+   * @param playCol
+   * @returns {boolean|undefined}
+   */
+  checkConnectFour(playRow, playCol){
+    let value = this.state.board[playRow][playCol];
+
+    if ((value === 0) || ((value > 0) && (this.state.currentPlayer !== value))) {
+      return false;
+    }
+
+    winningCells.push({row: playRow, col: playCol});
+
+    if(winningCells.length === 4)
+      return true;
+    else
+      return undefined;
+  }
+
+  checkVictoryDown(playRow, playCol) {
+    this.resetWinningCells(playRow, playCol);
+
+    //check down
+    for (let r=playRow+1; r<this.state.height; r++) {
+      let isConnectFour = this.checkConnectFour(r, playCol);
+      if (isConnectFour === false)
+        break;
+      else if (isConnectFour === true)
+        return true;
+    }
     return false;
   }
 
   checkVictorySide(playRow, playCol) {
-    let count = 1;
+    this.resetWinningCells(playRow, playCol);
 
     //check left side
     for (let c=playCol-1; c>=0; c--) {
-      let value = this.state.board[playRow][c];
-
-      if ((value === 0) || ((value >0) && (this.state.currentPlayer !== value))) {
+      let isConnectFour = this.checkConnectFour(playRow, c);
+      if (isConnectFour === false)
         break;
-      }
-      count++;
-      if (count === 4) {
+      else if (isConnectFour === true)
         return true;
-      }
     }
 
     //check right side
     for (let c=(playCol+1); c<this.state.width; c++) {
-      let value = this.state.board[playRow][c];
-
-      if ((value === 0) || ((value >0) && (this.state.currentPlayer !== value))) {
+      let isConnectFour = this.checkConnectFour(playRow, c);
+      if (isConnectFour === false)
         break;
-      }
-      count++;
-      if (count === 4) {
+      else if (isConnectFour === true)
         return true;
-      }
     }
 
     return false;
   }
 
   checkVictoryLeftDia(playRow, playCol) {
-    let count = 1;
+    this.resetWinningCells(playRow, playCol);
 
     //check left-top side
     for (let c=playCol-1, r=playRow-1; (c>=0 && r>=0); c--, r--) {
-      let value = this.state.board[r][c];
-
-      if ((value === 0) || ((value >0) && (this.state.currentPlayer !== value))) {
+      let isConnectFour = this.checkConnectFour(r, c);
+      if (isConnectFour === false)
         break;
-      }
-      count++;
-      if (count === 4) {
+      else if (isConnectFour === true)
         return true;
-      }
     }
 
     //check right-bottom side
     for (let c=playCol+1, r=playRow+1; (c<this.state.width && r<this.state.height); c++, r++) {
-      let value = this.state.board[r][c];
-
-      if ((value === 0) || ((value >0) && (this.state.currentPlayer !== value))) {
+      let isConnectFour = this.checkConnectFour(r, c);
+      if (isConnectFour === false)
         break;
-      }
-      count++;
-      if (count === 4) {
+      else if (isConnectFour === true)
         return true;
-      }
     }
 
     return false;
   }
 
   checkVictoryRightDia(playRow, playCol) {
-    let count = 1;
+    this.resetWinningCells(playRow, playCol);
 
     //check right-top side
     for (let c=playCol+1, r=playRow-1; (c<this.state.width && r>=0); c++, r--) {
-      let value = this.state.board[r][c];
-
-      if ((value === 0) || ((value >0) && (this.state.currentPlayer !== value))) {
+      let isConnectFour = this.checkConnectFour(r, c);
+      if (isConnectFour === false)
         break;
-      }
-      count++;
-      if (count === 4) {
+      else if (isConnectFour === true)
         return true;
-      }
     }
 
     //check left-bottom side
     for (let c=playCol-1, r=playRow+1; (c>=0 && r<this.state.height); c--, r++) {
-      let value = this.state.board[r][c];
-
-      if ((value === 0) || ((value >0) && (this.state.currentPlayer !== value))) {
+      let isConnectFour = this.checkConnectFour(r, c);
+      if (isConnectFour === false)
         break;
-      }
-      count++;
-      if (count === 4) {
+      else if (isConnectFour === true)
         return true;
-      }
     }
 
     return false;
   }
 
   /**
-   * Check the victory horizontally. This function can be improved
+   * Called when New Game button is clicke
    */
-  checkHorizontal() {
-    let count = 0;
-    let currentPlayer = -1;
-    for (let r=0; r<this.state.height; r++) {
-      for (let c=0; c<this.state.width; c++) {
-        let value = this.state.board[r][c];
-        //console.log(value + " " + count + " " + currentPlayer);
-        if (value > 0) {
-          if (currentPlayer === value){
-            count++;
-
-            if (count === 4) {
-              this.setState({winner : currentPlayer});
-              return true;
-            }
-          }
-          else {
-            currentPlayer = value;
-            count = 1;
-          }
-        }
-        else {
-          currentPlayer = -1;
-          count = 0;
-        }
-      }
-    }
-
-    return false;
-  }
-
-  /**
-   * Check the victory vertically. This function can be improved
-   */
-  checkVertical(){
-    var count = 0;
-    var currentPlayer = -1;
-    for (var c=0; c<this.state.width; c++) {
-      for (var r=0; r<this.state.height; r++) {
-        var value = this.state.board[r][c];
-        //console.log(value + " " + count + " " + currentPlayer);
-        if (value > 0) {
-          if (currentPlayer === value){
-            count++;
-
-            if (count === 4) {
-              this.setState({winner : currentPlayer});
-              return true;
-            }
-          }
-          else {
-            currentPlayer = value;
-            count = 1;
-          }
-        }
-        else {
-          currentPlayer = -1;
-          count = 0;
-        }
-      }
-    }
-
-    return false;
-  }
-
-  /**
-   * Check the victory diagonally. T
-   *  Ran out of time
-   */
-  checkDiagonal() {
-    // The game is functional for Horizontal and Vertical.
-    //Sorry ran out of time
-  }
-
-  /**
-   * Print the winner
-   */
-  printVictory() {
-    console.log("Winner is " + this.state.winner);
-  }
-
-  /**
-   * Check Victory
-   */
-  checkVictory() {
-    if (!this.checkHorizontal()) {
-      if (!this.checkVertical()) {
-        if (!this.checkDiagonal()) {
-          return false;
-        }
-      }
-    }
-
-    this.printVictory();
-    return true;
-  }
-
   newGame = () => {
     this.setState({winner : 0});
-    var board = [];
-    for(var i= 0; i<this.state.height; i++) {
+    const board = [];
+    for(let i= 0; i<this.state.height; i++) {
       board.push(new Array(this.state.width).fill(0));
     }
     this.setState({board : board});
     this.setState({currentPlayer : 1});
   }
 
+  renderCell(item, mIndex, index) {
+    let playBoardStyle = ((this.state.winner === 0) ? {cursor: 'pointer'} : (item === 3) ? {cursor: 'default', opacity: '1.0'} : {cursor: 'default', opacity: '0.20'});
+    let winImage = blue;
+
+    if (item === 3) {
+      if(this.state.winner === 2)
+        winImage = red;
+    }
+
+    switch(item) {
+      case 0: return (<img key={(mIndex.toString() + index.toString())} alt=" " style={playBoardStyle} onClick={() => this.play(index + 1)} src={empty}/>);
+      case 1: return (<img key={(mIndex.toString() + index.toString())}  alt=" " style={playBoardStyle} onClick={() => this.play(index + 1)} src={blueIn}/>);
+      case 2: return (<img key={(mIndex.toString() + index.toString())}  alt=" " style={playBoardStyle} onClick={() => this.play(index + 1)} src={redIn}/>);
+      case 3: return (<img key={(mIndex.toString() + index.toString())}  alt=" " style={playBoardStyle} src={winImage}/>);
+      default: return (<span/>);
+    }
+  }
+
   render() {
-    var resultStyle = (this.state.winner === 0)? {display: 'none'} : {};
-    var playStyle = (this.state.winner === 0)? {} : {display: 'none'};
-    var buttonStyle = {cursor: 'pointer'};
-    var playBoardStyle = (this.state.winner === 0)? {cursor: 'pointer'} : {cursor: 'default' , opacity: '0.50'};
+    const resultStyle = (this.state.winner === 0) ? {display: 'none'} : {};
+    const playStyle = (this.state.winner === 0) ? {} : {display: 'none'};
+    const buttonStyle = {cursor: 'pointer', fontSize: '16px'};
 
     return (
         <div className="App">
@@ -342,7 +305,7 @@ class App extends React.Component{
             this.state.board.map((innerArray, mIndex) => (
                 <div >
                   {
-                    innerArray.map((item, index) => (item === 0)?<img key={(mIndex.toString() + index.toString())} alt=" " style={playBoardStyle} onClick={() => this.play(index + 1)} src={empty}/>:(item === 1)?<img key={(mIndex.toString() + index.toString())}  alt=" " style={playBoardStyle} onClick={() => this.play(index + 1)} src={blueIn}/>:<img key={(mIndex.toString() + index.toString())}  alt=" " style={playBoardStyle} onClick={() => this.play(index + 1)} src={redIn}/>)
+                    innerArray.map((item, index) => (this.renderCell(item, mIndex, index)))
                   }
                 </div>
               ))
