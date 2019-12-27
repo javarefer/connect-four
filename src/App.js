@@ -30,7 +30,8 @@ class App extends React.Component{
       playerColor:['Blue', 'Red'],
       winner: 0,
       height: 6,
-      width: 7
+      width: 7,
+      playInProgress: false
     };
 
     for(let i= 0; i<this.state.height; i++) {
@@ -45,8 +46,7 @@ class App extends React.Component{
    * @param player
    */
   play(column, player) {
-
-    if((this.state.winner > 0) || (column < 1)){
+    if(this.state.playInProgress || (this.state.winner > 0) || (column < 1)){
         return;
     }
 
@@ -60,10 +60,8 @@ class App extends React.Component{
 
     let playRow, playCol = -1;
 
-    for (var r=0; r<this.state.height; r++) {
-      if (board[r][column-1] === 0)
-        continue;
-      else if (this.state.board[r][column-1] !== 0) {
+    for (let r=0; r<this.state.height; r++) {
+      if (this.state.board[r][column-1] !== 0) {
         if(r >0) {
           playRow = r - 1;
           playCol = column-1;
@@ -72,7 +70,6 @@ class App extends React.Component{
         else {
           columnBlocked = true;
         }
-
         break;
       }
     }
@@ -82,16 +79,50 @@ class App extends React.Component{
     }
 
     if(!columnBlocked) {
-      board[playRow][playCol] = this.state.currentPlayer;
+      this.setState({playInProgress: true});
+      this.visualizePlay(playRow, playCol, 0);
     }
+  }
 
-    this.setState({board: board});
+  /**
+   * This function visualizes the play by moving the piece to the
+   * appropriate spot. Once the piece is moved to the spot the play
+   * in then processed to check for victory
+   *
+   * @param playRow
+   * @param playCol
+   * @param rowIndex
+   */
+  visualizePlay(playRow, playCol, rowIndex) {
+    if(playRow >= rowIndex) {
+      let board = this.state.board;
 
-    if(!columnBlocked) {
-      if (!this.checkVictoryForPlay(playRow, playCol)) {
-        this.setCurrentPlayer();
+      if(rowIndex > 0) {
+        board[rowIndex-1][playCol] = 0;
       }
+
+      board[rowIndex][playCol] = this.state.currentPlayer;
+
+      this.setState({board: board});
+
+      setTimeout(()=>this.visualizePlay(playRow, playCol, ++rowIndex), 200);
     }
+    else {
+      this.processPlay(playRow, playCol);
+    }
+  }
+
+  /**
+   * Process the play after the piece is moved to the spot
+   *
+   * @param playRow
+   * @param playCol
+   */
+  processPlay(playRow, playCol) {
+    if (!this.checkVictoryForPlay(playRow, playCol)) {
+      this.setCurrentPlayer();
+    }
+    this.setState({playInProgress: false});
   }
 
   /**
