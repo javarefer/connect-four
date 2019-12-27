@@ -14,12 +14,12 @@ import redIn from './redin.png';
 import empty from './empty.png';
 import './App.css';
 
-let winningCells = [];
-
 /**
  * Connect Four Game App
  */
 class App extends React.Component{
+
+  winningCells = [];
 
   constructor(props) {
     super(props);
@@ -131,14 +131,14 @@ class App extends React.Component{
   }
 
   resetWinningCells (playRow, playCol) {
-    winningCells = [{row: playRow, col: playCol}];
+    this.winningCells = [{row: playRow, col: playCol}];
   }
 
   setConnectFour() {
     let board = this.state.board;
 
-    for(let i=0; i<winningCells.length; i++) {
-      board[winningCells[i].row][winningCells[i].col] = 3;
+    for(let i=0; i<this.winningCells.length; i++) {
+      board[this.winningCells[i].row][this.winningCells[i].col] = 3;
     }
 
     this.setState({board: board});
@@ -161,9 +161,9 @@ class App extends React.Component{
       return false;
     }
 
-    winningCells.push({row: playRow, col: playCol});
+    this.winningCells.push({row: playRow, col: playCol});
 
-    if(winningCells.length === 4)
+    if(this.winningCells.length === 4)
       return true;
     else
       return undefined;
@@ -269,7 +269,7 @@ class App extends React.Component{
   }
 
   renderCell(item, mIndex, index) {
-    let playBoardStyle = ((this.state.winner === 0) ? {cursor: 'pointer'} : (item === 3) ? {cursor: 'default', opacity: '1.0'} : {cursor: 'default', opacity: '0.20'});
+    let playBoardStyle = ((this.state.winner === 0) ? {cursor: 'pointer'} : (item === 3) ? {cursor: 'default', animation: 'App-logo-spin infinite 4s linear', opacity: '1.0'} : {cursor: 'default', opacity: '0.20'});
     let winImage = blue;
 
     if (item === 3) {
