@@ -105,7 +105,7 @@ class App extends React.Component{
 
       this.setState({board: board});
 
-      setTimeout(()=>this.visualizePlay(playRow, playCol, ++rowIndex), 200);
+      setTimeout(()=>this.visualizePlay(playRow, playCol, ++rowIndex), 150);
     }
     else {
       this.processPlay(playRow, playCol);
@@ -119,10 +119,24 @@ class App extends React.Component{
    * @param playCol
    */
   processPlay(playRow, playCol) {
-    if (!this.checkVictoryForPlay(playRow, playCol)) {
+    if (this.checkVictoryForPlay(playRow, playCol)) {
+      this.setState({winner : this.state.currentPlayer});
+      console.log("Winner is " + this.state.winner);
+      this.setConnectFour();
+    }
+    else if (this.checkForDraw()) {
+      this.setState({winner : 3});
+      console.log("It's a draw");
+    }
+    else {
       this.setCurrentPlayer();
     }
+
     this.setState({playInProgress: false});
+  }
+
+  checkForDraw() {
+    return (this.state.board[0].indexOf(0) === -1);
   }
 
   /**
@@ -147,18 +161,10 @@ class App extends React.Component{
    * @returns {boolean}
    */
   checkVictoryForPlay (playRow, playCol) {
-    if(this.checkVictoryDown(playRow, playCol) ||
-        this.checkVictorySide(playRow, playCol) ||
-        this.checkVictoryLeftDia(playRow, playCol) ||
-        this.checkVictoryRightDia(playRow, playCol)) {
-
-      this.setState({winner : this.state.currentPlayer});
-      console.log("Winner is " + this.state.winner);
-      this.setConnectFour();
-      return true;
-    }
-
-    return false;
+    return (this.checkVictoryDown(playRow, playCol) ||
+            this.checkVictorySide(playRow, playCol) ||
+            this.checkVictoryLeftDia(playRow, playCol) ||
+            this.checkVictoryRightDia(playRow, playCol));
   }
 
   resetWinningCells (playRow, playCol) {
@@ -299,6 +305,15 @@ class App extends React.Component{
     this.setState({currentPlayer : 1});
   }
 
+  renderResult() {
+    switch (this.state.winner) {
+      case 1: return (<div><img alt=" " className="App-winner" src={blue}/> {this.state.playerColor[this.state.winner-1]} wins!!! </div>);
+      case 2: return (<div><img alt=" " className="App-winner" src={red}/> {this.state.playerColor[this.state.winner-1]} wins!!!</div>);
+      case 3: return (<div><img alt=" " className="App-winner" src={blue}/><img alt=" " className="App-winner" src={red}/> It's a draw!!! Play again!</div>);
+      default: return (<span/>);
+    }
+  }
+
   renderCell(item, mIndex, index) {
     let playBoardStyle = ((this.state.winner === 0) ? {cursor: 'pointer'} : (item === 3) ? {cursor: 'default', animation: 'App-logo-spin infinite 4s linear', opacity: '1.0'} : {cursor: 'default', opacity: '0.20'});
     let winImage = blue;
@@ -329,10 +344,10 @@ class App extends React.Component{
           <br/>
           <br/>
           <h2 style={playStyle}>{(this.state.currentPlayer === 1)?<img alt=" " className="App-currentPlay" src={blue}/>:(this.state.currentPlayer === 2)?<img alt=" " className="App-currentPlay" src={red}/>:<b/>} {this.state.playerColor[this.state.currentPlayer-1]}'s turn...</h2>
-          <h2 style={resultStyle}>{(this.state.currentPlayer === 1)?<img alt=" " className="App-winner" src={blue}/>:(this.state.currentPlayer === 2)?<img alt=" " className="App-winner" src={red}/>:<b/>} {this.state.playerColor[this.state.winner-1]} wins!!!</h2>
+          <h2 style={resultStyle}>{this.renderResult()}</h2>
           {
             this.state.board.map((innerArray, mIndex) => (
-                <div >
+                <div key={mIndex}>
                   {
                     innerArray.map((item, index) => (this.renderCell(item, mIndex, index)))
                   }
