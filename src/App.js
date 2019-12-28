@@ -344,6 +344,7 @@ class App extends React.Component{
   }
 
   renderCell(item, mIndex, index) {
+    let cellStyle = {marginLeft: '2px', marginRight: '2px'};
     let playBoardStyle = ((this.state.winner === 0) ? {cursor: 'pointer'} : (item === 3) ? {cursor: 'default', animation: 'App-logo-spin infinite 4s linear', opacity: '1.0'} : {cursor: 'default', opacity: '0.20'});
     let winImage = blue;
 
@@ -353,10 +354,10 @@ class App extends React.Component{
     }
 
     switch(item) {
-      case 0: return (<img key={(mIndex.toString() + index.toString())} alt=" " style={playBoardStyle} onClick={() => this.play(index + 1)} src={empty}/>);
-      case 1: return (<img key={(mIndex.toString() + index.toString())}  alt=" " style={playBoardStyle} onClick={() => this.play(index + 1)} src={blueIn}/>);
-      case 2: return (<img key={(mIndex.toString() + index.toString())}  alt=" " style={playBoardStyle} onClick={() => this.play(index + 1)} src={redIn}/>);
-      case 3: return (<img key={(mIndex.toString() + index.toString())}  alt=" " style={playBoardStyle} src={winImage}/>);
+      case 0: return (<span style={cellStyle}><img key={(mIndex.toString() + index.toString())} alt=" " style={playBoardStyle} onClick={() => this.play(index + 1)} src={empty}/></span>);
+      case 1: return (<span style={cellStyle}><img key={(mIndex.toString() + index.toString())}  alt=" " style={playBoardStyle} onClick={() => this.play(index + 1)} src={blueIn}/></span>);
+      case 2: return (<span style={cellStyle}><img key={(mIndex.toString() + index.toString())}  alt=" " style={playBoardStyle} onClick={() => this.play(index + 1)} src={redIn}/></span>);
+      case 3: return (<span style={cellStyle}><img key={(mIndex.toString() + index.toString())}  alt=" " style={playBoardStyle} src={winImage}/></span>);
       default: return (<span/>);
     }
   }
