@@ -12,6 +12,11 @@ import blue from './blue.png';
 import blueIn from './bluein.png';
 import redIn from './redin.png';
 import empty from './empty.png';
+import winSound from './win.wav';
+import playTicSound from './playtic.wav';
+import playSound from './play.wav';
+import startSound from './start.wav';
+import drawSound from './draw.wav';
 import './App.css';
 
 /**
@@ -20,6 +25,12 @@ import './App.css';
 class App extends React.Component{
 
   winningCells = [];
+
+  startSound = new Audio(startSound);
+  playTicSound = new Audio(playTicSound);
+  playSound = new Audio(playSound);
+  winSound = new Audio(winSound);
+  drawSound = new Audio(drawSound);
 
   constructor(props) {
     super(props);
@@ -37,6 +48,8 @@ class App extends React.Component{
     for(let i= 0; i<this.state.height; i++) {
       this.state.board.push(new Array(this.state.width).fill(0));
     }
+
+    this.startSound.play();
   }
 
   /**
@@ -95,6 +108,8 @@ class App extends React.Component{
    */
   visualizePlay(playRow, playCol, rowIndex) {
     if(playRow >= rowIndex) {
+      this.playTicSound.play();
+
       let board = this.state.board;
 
       if(rowIndex > 0) {
@@ -108,6 +123,7 @@ class App extends React.Component{
       setTimeout(()=>this.visualizePlay(playRow, playCol, ++rowIndex), 150);
     }
     else {
+      this.playSound.play();
       this.processPlay(playRow, playCol);
     }
   }
@@ -123,8 +139,10 @@ class App extends React.Component{
       this.setState({winner : this.state.currentPlayer});
       console.log("Winner is " + this.state.winner);
       this.setConnectFour();
+      this.winSound.play();
     }
     else if (this.checkForDraw()) {
+      this.drawSound.play();
       this.setState({winner : 3});
       console.log("It's a draw");
     }
@@ -296,6 +314,8 @@ class App extends React.Component{
    * Called when New Game button is clicke
    */
   newGame = () => {
+    this.startSound.play();
+
     this.setState({winner : 0});
     const board = [];
     for(let i= 0; i<this.state.height; i++) {
