@@ -12,11 +12,16 @@ import blue from './blue.png';
 import blueIn from './bluein.png';
 import redIn from './redin.png';
 import empty from './empty.png';
-import winSound from './win.wav';
-import playTicSound from './playtic.wav';
-import playSound from './play.wav';
-import startSound from './start.wav';
-import drawSound from './draw.wav';
+import win1Sound from './sound/win1.wav';
+import win2Sound from './sound/win2.wav';
+import win3Sound from './sound/win3.wav';
+import win4Sound from './sound/win4.wav';
+import win5Sound from './sound/win5.wav';
+import playTicSound from './sound/playtic.wav';
+import play1Sound from './sound/play1.wav';
+import play2Sound from './sound/play2.wav';
+import startSound from './sound/start.wav';
+import drawSound from './sound/draw.wav';
 import './App.css';
 
 /**
@@ -28,8 +33,10 @@ class App extends React.Component{
 
   startSound = new Audio(startSound);
   playTicSound = new Audio(playTicSound);
-  playSound = new Audio(playSound);
-  winSound = new Audio(winSound);
+  play1Sound = new Audio(play1Sound);
+  play2Sound = new Audio(play2Sound);
+  winSound = new Audio();
+  winSounds = [win1Sound, win2Sound, win3Sound, win4Sound, win5Sound];
   drawSound = new Audio(drawSound);
 
   constructor(props) {
@@ -44,12 +51,10 @@ class App extends React.Component{
       width: 7,
       playInProgress: false
     };
+  }
 
-    for(let i= 0; i<this.state.height; i++) {
-      this.state.board.push(new Array(this.state.width).fill(0));
-    }
-
-    this.startSound.play();
+  componentDidMount() {
+    this.newGame();
   }
 
   /**
@@ -123,7 +128,6 @@ class App extends React.Component{
       setTimeout(()=>this.visualizePlay(playRow, playCol, ++rowIndex), 150);
     }
     else {
-      this.playSound.play();
       this.processPlay(playRow, playCol);
     }
   }
@@ -139,6 +143,7 @@ class App extends React.Component{
       this.setState({winner : this.state.currentPlayer});
       console.log("Winner is " + this.state.winner);
       this.setConnectFour();
+      this.winSound.src = this.winSounds[Math.floor(Math.random() * Math.floor(5))];
       this.winSound.play();
     }
     else if (this.checkForDraw()) {
@@ -162,10 +167,14 @@ class App extends React.Component{
    * every play
    */
   setCurrentPlayer() {
-    if (this.state.currentPlayer === 1)
-      this.setState({currentPlayer : 2});
-    else
-      this.setState({currentPlayer : 1});
+    if (this.state.currentPlayer === 1) {
+      this.play1Sound.play();
+      this.setState({currentPlayer: 2});
+    }
+    else {
+      this.play2Sound.play();
+      this.setState({currentPlayer: 1});
+    }
 
     //console.log( this.state.currentPlayer);
   }
