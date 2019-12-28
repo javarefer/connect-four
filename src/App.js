@@ -344,7 +344,7 @@ class App extends React.Component{
   }
 
   renderCell(item, mIndex, index) {
-    let cellStyle = {marginLeft: '2px', marginRight: '2px'};
+    let cellStyle = {margin: '1px'};
     let playBoardStyle = ((this.state.winner === 0) ? {cursor: 'pointer'} : (item === 3) ? {cursor: 'default', animation: 'App-logo-spin infinite 4s linear', opacity: '1.0'} : {cursor: 'default', opacity: '0.20'});
     let winImage = blue;
 
@@ -366,6 +366,7 @@ class App extends React.Component{
     const resultStyle = (this.state.winner === 0) ? {display: 'none'} : {};
     const playStyle = (this.state.winner === 0) ? {} : {display: 'none'};
     const buttonStyle = {cursor: 'pointer', fontSize: '16px'};
+    const rowStyle = {padding: '0px', margin: '0px'};
 
     return (
         <div className="App">
@@ -377,7 +378,7 @@ class App extends React.Component{
           <h2 style={resultStyle}>{this.renderResult()}</h2>
           {
             this.state.board.map((innerArray, mIndex) => (
-                <div key={mIndex}>
+                <div style={rowStyle} key={mIndex}>
                   {
                     innerArray.map((item, index) => (this.renderCell(item, mIndex, index)))
                   }
