@@ -1,5 +1,6 @@
 /**
- * Connect Four Game
+ * Connect Four Game for 2 players
+ *
  * Author: Rahul Sapkal (rahul@javareference.com)
  * Copyright 2019
  * ---------------------------------------------------
@@ -7,25 +8,34 @@
  */
 
 import React from 'react';
+
+//import images
 import red from './red.png';
 import blue from './blue.png';
 import blueIn from './bluein.png';
 import redIn from './redin.png';
 import empty from './empty.png';
+
+//import sounds
 import win1Sound from './sound/win1.wav';
 import win2Sound from './sound/win2.wav';
 import win3Sound from './sound/win3.wav';
 import win4Sound from './sound/win4.wav';
 import win5Sound from './sound/win5.wav';
+import win6Sound from './sound/win6.wav';
+import win7Sound from './sound/win7.mp3';
+import win8Sound from './sound/win8.wav';
 import playTicSound from './sound/playtic.wav';
 import play1Sound from './sound/play1.wav';
 import play2Sound from './sound/play2.wav';
 import startSound from './sound/start.wav';
 import drawSound from './sound/draw.wav';
+
+//import css
 import './App.css';
 
 /**
- * Connect Four Game App
+ * Connect Four Game App Class
  */
 class App extends React.Component{
 
@@ -36,7 +46,7 @@ class App extends React.Component{
   play1Sound = new Audio(play1Sound);
   play2Sound = new Audio(play2Sound);
   winSound = new Audio();
-  winSounds = [win1Sound, win2Sound, win3Sound, win4Sound, win5Sound];
+  winSounds = [win1Sound, win2Sound, win3Sound, win4Sound, win5Sound, win6Sound, win7Sound, win8Sound];
   drawSound = new Audio(drawSound);
 
   constructor(props) {
@@ -53,52 +63,62 @@ class App extends React.Component{
     };
   }
 
+  /**
+   * Start new game on this life cycle hook
+   */
   componentDidMount() {
     this.newGame();
   }
 
   /**
-   * This method is called when a player makes a play
+   * This function returns true is the play on this column is allowed
    *
-   * @param column
-   * @param player
+   * @param playColumn
+   * @returns {boolean}
    */
-  play(column, player) {
-    if(this.state.playInProgress || (this.state.winner > 0) || (column < 1)){
-        return;
-    }
+  checkAllowPlay(playColumn){
+    //Dont allow play if
+    //- Another play is in progress OR
+    //- The game has a winner OR
+    //- Invalid column OR
+    //- The column is fully played
+    return !(this.state.playInProgress ||
+             (this.state.winner > 0) ||
+             (playColumn < 0) ||
+             (this.state.board[0][playColumn] !== 0));
+  }
 
-    if (player) {
-      this.setState({currentPlayer : player});
-    }
+  /**
+   * This function is called when a player makes a play on a particular column
+   * to find the valid cell down that column to land the piece. The column index
+   * is passed to this function.
+   *
+   * First check if the play is valid. If yes then go row by row in the column to
+   * find valid cell for the piece
+   *
+   * @param playColumn
+   */
+  play(playColumn) {
+    if (this.checkAllowPlay(playColumn)) {
+      //Find valid cell to land the piece
+      let playRow;
 
-    let board = this.state.board;
-    let found = false;
-    let columnBlocked = false;
-
-    let playRow, playCol = -1;
-
-    for (let r=0; r<this.state.height; r++) {
-      if (this.state.board[r][column-1] !== 0) {
-        if(r >0) {
-          playRow = r - 1;
-          playCol = column-1;
-          found = true;
+      //Start from the 2nd row, we already checked the 1st row
+      for (let currentRow = 1; currentRow < this.state.height; currentRow++) {
+        if (this.state.board[currentRow][playColumn] !== 0) {
+          playRow = currentRow - 1;
+          break;
         }
-        else {
-          columnBlocked = true;
-        }
-        break;
       }
-    }
-    if(!found) {
-      playRow = board.length - 1;
-      playCol = column-1;
-    }
+      //If playRow is not set that means the entire column is empty
+      //place the piece on the last row of the play column
+      if (playRow === undefined) {
+        playRow = this.state.height - 1;
+      }
 
-    if(!columnBlocked) {
       this.setState({playInProgress: true});
-      this.visualizePlay(playRow, playCol, 0);
+      //visualize the play with play row and play column
+      this.visualizePlay(playRow, playColumn, 0);
     }
   }
 
@@ -133,18 +153,21 @@ class App extends React.Component{
   }
 
   /**
-   * Process the play after the piece is moved to the spot
+   * Process the play after every move
    *
    * @param playRow
    * @param playCol
    */
   processPlay(playRow, playCol) {
     if (this.checkVictoryForPlay(playRow, playCol)) {
-      this.setState({winner : this.state.currentPlayer});
-      console.log("Winner is " + this.state.winner);
-      this.setConnectFour();
-      this.winSound.src = this.winSounds[Math.floor(Math.random() * Math.floor(5))];
+      //play random winning sound
+      this.winSound.src = this.winSounds[Math.floor(Math.random() * Math.floor(8))];
       this.winSound.play();
+
+      this.setState({winner : this.state.currentPlayer});
+      this.setConnectFour();
+
+      console.log("Winner is " + this.state.winner);
     }
     else if (this.checkForDraw()) {
       this.drawSound.play();
@@ -158,6 +181,12 @@ class App extends React.Component{
     this.setState({playInProgress: false});
   }
 
+  /**
+   * This function check for a draw scenario after every move by checking if
+   * the first row in the board data structure is all filled with values
+   *
+   * @returns {boolean}
+   */
   checkForDraw() {
     return (this.state.board[0].indexOf(0) === -1);
   }
@@ -180,24 +209,19 @@ class App extends React.Component{
   }
 
   /**
-   * This function checks a winning scenario after
-   * every move
+   * This function resets the winning cells by setting it to the
+   * current played cell - row and col
    *
    * @param playRow
    * @param playCol
-   * @returns {boolean}
    */
-  checkVictoryForPlay (playRow, playCol) {
-    return (this.checkVictoryDown(playRow, playCol) ||
-            this.checkVictorySide(playRow, playCol) ||
-            this.checkVictoryLeftDia(playRow, playCol) ||
-            this.checkVictoryRightDia(playRow, playCol));
-  }
-
   resetWinningCells (playRow, playCol) {
     this.winningCells = [{row: playRow, col: playCol}];
   }
 
+  /**
+   * This function sets the winning four cells on the board data structure
+   */
   setConnectFour() {
     let board = this.state.board;
 
@@ -209,7 +233,7 @@ class App extends React.Component{
   }
 
   /**
-   * This method checks for connect four for given row and col.
+   * This function checks for connect four for given row and col.
    * It returns false if it's not a connect four
    * It returns true if it's a connect four
    * It returns undefined if it's not sure whether it is a connect four yet
@@ -233,6 +257,28 @@ class App extends React.Component{
       return undefined;
   }
 
+  /**
+   * This function checks a winning scenario after every move
+   *
+   * @param playRow
+   * @param playCol
+   * @returns {boolean}
+   */
+  checkVictoryForPlay (playRow, playCol) {
+    return (this.checkVictoryDown(playRow, playCol) ||
+        this.checkVictorySide(playRow, playCol) ||
+        this.checkVictoryLeftDia(playRow, playCol) ||
+        this.checkVictoryRightDia(playRow, playCol));
+  }
+
+  /**
+   * This function checks for victory vertically.
+   * The check is on the down side of the play only
+   *
+   * @param playRow
+   * @param playCol
+   * @returns {boolean}
+   */
   checkVictoryDown(playRow, playCol) {
     this.resetWinningCells(playRow, playCol);
 
@@ -247,6 +293,14 @@ class App extends React.Component{
     return false;
   }
 
+  /**
+   * This function checks for victory horizontally.
+   * The check is on the left and right side of the play
+   *
+   * @param playRow
+   * @param playCol
+   * @returns {boolean}
+   */
   checkVictorySide(playRow, playCol) {
     this.resetWinningCells(playRow, playCol);
 
@@ -271,6 +325,14 @@ class App extends React.Component{
     return false;
   }
 
+  /**
+   * This function checks for victory diagonally from top left to bottom right.
+   * The check is on the top left and bottom right side of the play
+   *
+   * @param playRow
+   * @param playCol
+   * @returns {boolean}
+   */
   checkVictoryLeftDia(playRow, playCol) {
     this.resetWinningCells(playRow, playCol);
 
@@ -295,6 +357,14 @@ class App extends React.Component{
     return false;
   }
 
+  /**
+   * This function checks for victory diagonally from top right to bottom left.
+   * The check is on the top right and bottom left side of the play
+   *
+   * @param playRow
+   * @param playCol
+   * @returns {boolean}
+   */
   checkVictoryRightDia(playRow, playCol) {
     this.resetWinningCells(playRow, playCol);
 
@@ -320,7 +390,7 @@ class App extends React.Component{
   }
 
   /**
-   * Called when New Game button is clicke
+   * This function starts a new game by initializing all the state variables
    */
   newGame = () => {
     this.startSound.play();
@@ -332,8 +402,13 @@ class App extends React.Component{
     }
     this.setState({board : board});
     this.setState({currentPlayer : 1});
-  }
+  };
 
+  /**
+   * This function renders the result of the game win or draw
+   *
+   * @returns {*}
+   */
   renderResult() {
     switch (this.state.winner) {
       case 1: return (<div><img alt=" " className="App-winner" src={blue}/> {this.state.playerColor[this.state.winner-1]} wins!!! </div>);
@@ -343,6 +418,14 @@ class App extends React.Component{
     }
   }
 
+  /**
+   * This function renders a cell on the board
+   *
+   * @param item
+   * @param mIndex
+   * @param index
+   * @returns {*}
+   */
   renderCell(item, mIndex, index) {
     let playBoardStyle = ((this.state.winner === 0) ? {cursor: 'pointer'} : (item === 3) ? {cursor: 'default', animation: 'App-logo-spin infinite 4s linear', opacity: '1.0'} : {cursor: 'default', opacity: '0.20'});
     let winImage = blue;
@@ -353,14 +436,19 @@ class App extends React.Component{
     }
 
     switch(item) {
-      case 0: return (<img key={(mIndex.toString() + index.toString())} alt=" " style={playBoardStyle} onClick={() => this.play(index + 1)} src={empty}/>);
-      case 1: return (<img key={(mIndex.toString() + index.toString())}  alt=" " style={playBoardStyle} onClick={() => this.play(index + 1)} src={blueIn}/>);
-      case 2: return (<img key={(mIndex.toString() + index.toString())}  alt=" " style={playBoardStyle} onClick={() => this.play(index + 1)} src={redIn}/>);
+      case 0: return (<img key={(mIndex.toString() + index.toString())} alt=" " style={playBoardStyle} onClick={() => this.play(index)} src={empty}/>);
+      case 1: return (<img key={(mIndex.toString() + index.toString())}  alt=" " style={playBoardStyle} onClick={() => this.play(index)} src={blueIn}/>);
+      case 2: return (<img key={(mIndex.toString() + index.toString())}  alt=" " style={playBoardStyle} onClick={() => this.play(index)} src={redIn}/>);
       case 3: return (<img key={(mIndex.toString() + index.toString())}  alt=" " style={playBoardStyle} src={winImage}/>);
       default: return (<span/>);
     }
   }
 
+  /**
+   * This function renders the board
+   *
+   * @returns {*}
+   */
   render() {
     const resultStyle = (this.state.winner === 0) ? {display: 'none'} : {};
     const playStyle = (this.state.winner === 0) ? {} : {display: 'none'};
