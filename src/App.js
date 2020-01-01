@@ -1,6 +1,6 @@
 /**
  * Connect Four Game for 2 players
- *
+ * Version 1.0
  * Author: Rahul Sapkal (rahul@javareference.com)
  * Copyright 2019
  * ---------------------------------------------------
