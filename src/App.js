@@ -133,7 +133,7 @@ class App extends React.Component{
    */
   visualizePlay(playRow, playCol, rowIndex) {
     if(playRow >= rowIndex) {
-      this.playTicSound.play();
+      //this.playTicSound.play();
 
       let board = this.state.board;
 
@@ -145,7 +145,7 @@ class App extends React.Component{
 
       this.setState({board: board});
 
-      setTimeout(()=>this.visualizePlay(playRow, playCol, ++rowIndex), 150);
+      setTimeout(()=>this.visualizePlay(playRow, playCol, ++rowIndex), 100);
     }
     else {
       this.processPlay(playRow, playCol);
@@ -452,26 +452,25 @@ class App extends React.Component{
   render() {
     const resultStyle = (this.state.winner === 0) ? {display: 'none'} : {};
     const playStyle = (this.state.winner === 0) ? {} : {display: 'none'};
-    const buttonStyle = {cursor: 'pointer', fontSize: '16px'};
-    const rowStyle = {padding: '0px', margin: '0px'};
 
     return (
         <div className="App">
-          <br/>
-          <button style={buttonStyle} onClick={this.newGame}><b>New Game</b></button>
-          <br/>
-          <br/>
-          <h2 style={playStyle}>{(this.state.currentPlayer === 1)?<img alt=" " className="App-currentPlay" src={blue}/>:(this.state.currentPlayer === 2)?<img alt=" " className="App-currentPlay" src={red}/>:<b/>} {this.state.playerColor[this.state.currentPlayer-1]}'s turn...</h2>
-          <h2 style={resultStyle}>{this.renderResult()}</h2>
-          {
-            this.state.board.map((innerArray, mIndex) => (
-                <div style={rowStyle} key={mIndex}>
-                  {
-                    innerArray.map((item, index) => (this.renderCell(item, mIndex, index)))
-                  }
-                </div>
-              ))
-          }
+          <div className="Game-header">
+            <button className="Game-button" onClick={this.newGame}><b>New Game</b></button>
+          </div>
+          <div className="Game-container">
+            <h2 style={playStyle}>{(this.state.currentPlayer === 1)?<img alt=" " className="App-currentPlay" src={blue}/>:(this.state.currentPlayer === 2)?<img alt=" " className="App-currentPlay" src={red}/>:<b/>} {this.state.playerColor[this.state.currentPlayer-1]}'s turn...</h2>
+            <h2 style={resultStyle}>{this.renderResult()}</h2>
+            {
+              this.state.board.map((innerArray, mIndex) => (
+                  <div className="Board-row" key={mIndex}>
+                    {
+                      innerArray.map((item, index) => (this.renderCell(item, mIndex, index)))
+                    }
+                  </div>
+                ))
+            }
+          </div>
         </div>
     );
   }
