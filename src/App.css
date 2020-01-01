@@ -29,6 +29,14 @@
   color: black;
 }
 
+.Game-button-right {
+  cursor: pointer;
+  font-size: 14px;
+  background-color: white;
+  color: black;
+  float: right;
+}
+
 .Game-container {
   padding-top: 20px;
 }

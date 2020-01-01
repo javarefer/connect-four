@@ -59,7 +59,9 @@ class App extends React.Component{
       winner: 0,
       height: 6,
       width: 7,
-      playInProgress: false
+      playInProgress: false,
+      themes: ['Dark', 'Light'],
+      currentTheme: 0,
     };
   }
 
@@ -405,6 +407,25 @@ class App extends React.Component{
   };
 
   /**
+   * Toggle Game Theme from Dark to Light
+   */
+  changeTheme = () => {
+    if(this.state.currentTheme === 0) {
+      document.body.style.backgroundColor = 'white';
+      document.body.style.color = 'black';
+
+      this.setState({currentTheme : 1});
+    }
+    else
+    {
+      document.body.style.backgroundColor = 'black';
+      document.body.style.color = 'white';
+
+      this.setState({currentTheme : 0});
+    }
+  };
+
+  /**
    * This function renders the result of the game win or draw
    *
    * @returns {*}
@@ -457,6 +478,7 @@ class App extends React.Component{
         <div className="App">
           <div className="Game-header">
             <button className="Game-button" onClick={this.newGame}><b>New Game</b></button>
+            <button id="themeButton" className="Game-button-right" onClick={this.changeTheme}><b>{this.state.themes[this.state.currentTheme]}</b></button>
           </div>
           <div className="Game-container">
             <h2 style={playStyle}>{(this.state.currentPlayer === 1)?<img alt=" " className="App-currentPlay" src={blue}/>:(this.state.currentPlayer === 2)?<img alt=" " className="App-currentPlay" src={red}/>:<b/>} {this.state.playerColor[this.state.currentPlayer-1]}'s turn...</h2>
