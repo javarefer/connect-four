@@ -60,7 +60,7 @@ class App extends React.Component{
       height: 6,
       width: 7,
       playInProgress: false,
-      themes: ['Dark', 'Light'],
+      themes: ['Light', 'Dark'],
       currentTheme: 0,
     };
   }
