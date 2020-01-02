@@ -20,6 +20,14 @@
   color: white;
   text-align: left;
   padding: 10px;
+  border-radius: 5px;
+  margin: 5px;
+}
+
+.Game-title {
+  color: black;
+  font-weight: bolder;
+  font-size: 14px;
 }
 
 .Game-button {
@@ -27,18 +35,18 @@
   font-size: 14px;
   background-color: white;
   color: black;
+  margin-left: 5px;
+  margin-right: 5px;
+  margin-top: -2px;
 }
 
-.Game-button-right {
-  cursor: pointer;
-  font-size: 14px;
-  background-color: white;
-  color: black;
+.Game-button-panel {
   float: right;
+  margin-top: -1px;
 }
 
 .Game-container {
-  padding-top: 20px;
+  padding-top: 10px;
 }
 
 .Board-row {

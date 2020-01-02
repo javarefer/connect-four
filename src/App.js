@@ -473,12 +473,16 @@ class App extends React.Component{
   render() {
     const resultStyle = (this.state.winner === 0) ? {display: 'none'} : {};
     const playStyle = (this.state.winner === 0) ? {} : {display: 'none'};
+    const gameTitleStyle = (this.state.currentTheme === 0) ? {color: 'black', fontSize: '14px', fontWeight: 'bolder'} : {color: 'white', fontSize: '14px', fontWeight: 'bolder'};
 
     return (
         <div className="App">
           <div className="Game-header">
-            <button className="Game-button" onClick={this.newGame}><b>New Game</b></button>
-            <button id="themeButton" className="Game-button-right" onClick={this.changeTheme}><b>{this.state.themes[this.state.currentTheme]}</b></button>
+            <span style={gameTitleStyle}>CONNECT FOUR</span>
+            <span className="Game-button-panel">
+              <button className="Game-button" onClick={this.newGame}><b>New Game</b></button>
+              <button id="themeButton" className="Game-button" onClick={this.changeTheme}><b>{this.state.themes[this.state.currentTheme]}</b></button>
+            </span>
           </div>
           <div className="Game-container">
             <h2 style={playStyle}>{(this.state.currentPlayer === 1)?<img alt=" " className="App-currentPlay" src={blue}/>:(this.state.currentPlayer === 2)?<img alt=" " className="App-currentPlay" src={red}/>:<b/>} {this.state.playerColor[this.state.currentPlayer-1]}'s turn...</h2>
