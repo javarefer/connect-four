@@ -25,7 +25,6 @@ import win5Sound from './sound/win5.wav';
 import win6Sound from './sound/win6.wav';
 import win7Sound from './sound/win7.mp3';
 import win8Sound from './sound/win8.wav';
-import playTicSound from './sound/playtic.wav';
 import play1Sound from './sound/play1.wav';
 import play2Sound from './sound/play2.wav';
 import startSound from './sound/start.wav';
@@ -39,10 +38,19 @@ import './App.css';
  */
 class App extends React.Component{
 
+  victoryDirection = {
+    down_vertical: {rowMod: 1, colMod: 0},
+    right_horizontal: {rowMod: 0, colMod: 1},
+    left_horizontal: {rowMod: 0, colMod: -1},
+    bottom_right_diagonal: {rowMod: 1, colMod: 1},
+    top_left_diagonal: {rowMod: -1, colMod: -1},
+    top_right_diagonal: {rowMod: -1, colMod: 1},
+    bottom_left_diagonal: {rowMod: 1, colMod: -1}
+  };
+
   winningCells = [];
 
   startSound = new Audio(startSound);
-  playTicSound = new Audio(playTicSound);
   play1Sound = new Audio(play1Sound);
   play2Sound = new Audio(play2Sound);
   winSound = new Audio();
@@ -211,17 +219,6 @@ class App extends React.Component{
   }
 
   /**
-   * This function resets the winning cells by setting it to the
-   * current played cell - row and col
-   *
-   * @param playRow
-   * @param playCol
-   */
-  resetWinningCells (playRow, playCol) {
-    this.winningCells = [{row: playRow, col: playCol}];
-  }
-
-  /**
    * This function sets the winning four cells on the board data structure
    */
   setConnectFour() {
@@ -244,7 +241,8 @@ class App extends React.Component{
    * @param playCol
    * @returns {boolean|undefined}
    */
-  checkConnectFour(playRow, playCol){
+  checkConnectFour = (playRow, playCol) => {
+    console.log(playRow + "   " + playCol);
     let value = this.state.board[playRow][playCol];
 
     if ((value === 0) || ((value > 0) && (this.state.currentPlayer !== value))) {
@@ -257,7 +255,7 @@ class App extends React.Component{
       return true;
     else
       return undefined;
-  }
+  };
 
   /**
    * This function checks a winning scenario after every move
@@ -267,129 +265,49 @@ class App extends React.Component{
    * @returns {boolean}
    */
   checkVictoryForPlay (playRow, playCol) {
-    return (this.checkVictoryDown(playRow, playCol) ||
-        this.checkVictorySide(playRow, playCol) ||
-        this.checkVictoryLeftDia(playRow, playCol) ||
-        this.checkVictoryRightDia(playRow, playCol));
+    return (this.checkVictory(playRow, playCol, true)(this.victoryDirection.down_vertical) ||
+        this.checkVictory(playRow, playCol, true)(this.victoryDirection.left_horizontal) ||
+        this.checkVictory(playRow, playCol)(this.victoryDirection.right_horizontal) ||
+        this.checkVictory(playRow, playCol, true)(this.victoryDirection.top_left_diagonal) ||
+        this.checkVictory(playRow, playCol)(this.victoryDirection.bottom_right_diagonal) ||
+        this.checkVictory(playRow, playCol, true)(this.victoryDirection.top_right_diagonal) ||
+        this.checkVictory(playRow, playCol)(this.victoryDirection.bottom_left_diagonal)
+    );
   }
 
   /**
-   * This function checks for victory vertically.
-   * The check is on the down side of the play only
+   * This function returns a function that checks for the victory
+   * in given direction
    *
    * @param playRow
    * @param playCol
-   * @returns {boolean}
+   * @param resetCells
+   * @returns {function(...[*]=)}
    */
-  checkVictoryDown(playRow, playCol) {
-    this.resetWinningCells(playRow, playCol);
-
-    //check down
-    for (let r=playRow+1; r<this.state.height; r++) {
-      let isConnectFour = this.checkConnectFour(r, playCol);
-      if (isConnectFour === false)
-        break;
-      else if (isConnectFour === true)
-        return true;
-    }
-    return false;
-  }
-
-  /**
-   * This function checks for victory horizontally.
-   * The check is on the left and right side of the play
-   *
-   * @param playRow
-   * @param playCol
-   * @returns {boolean}
-   */
-  checkVictorySide(playRow, playCol) {
-    this.resetWinningCells(playRow, playCol);
-
-    //check left side
-    for (let c=playCol-1; c>=0; c--) {
-      let isConnectFour = this.checkConnectFour(playRow, c);
-      if (isConnectFour === false)
-        break;
-      else if (isConnectFour === true)
-        return true;
+  checkVictory = (playRow, playCol, resetWinningCells) => {
+    if (resetWinningCells) {
+      //Reset winning cells
+      this.winningCells = [{row: playRow, col: playCol}];
     }
 
-    //check right side
-    for (let c=(playCol+1); c<this.state.width; c++) {
-      let isConnectFour = this.checkConnectFour(playRow, c);
-      if (isConnectFour === false)
-        break;
-      else if (isConnectFour === true)
-        return true;
+    return (direction) => {
+      for (let r=playRow+direction.rowMod, c=playCol+direction.colMod; ; r+=direction.rowMod, c+=direction.colMod) {
+        if(((direction.rowMod === 1) && (r>=this.state.height)) ||
+           ((direction.rowMod === -1) && (r<0)) ||
+           ((direction.colMod === 1) && (c>=this.state.width)) ||
+           ((direction.colMod === -1) && (c<0))) {
+          break;
+        }
+
+        let isConnectFour = this.checkConnectFour(r, c);
+        if (isConnectFour === false)
+          break;
+        else if (isConnectFour === true)
+          return true;
+      }
+      return false;
     }
-
-    return false;
-  }
-
-  /**
-   * This function checks for victory diagonally from top left to bottom right.
-   * The check is on the top left and bottom right side of the play
-   *
-   * @param playRow
-   * @param playCol
-   * @returns {boolean}
-   */
-  checkVictoryLeftDia(playRow, playCol) {
-    this.resetWinningCells(playRow, playCol);
-
-    //check left-top side
-    for (let c=playCol-1, r=playRow-1; (c>=0 && r>=0); c--, r--) {
-      let isConnectFour = this.checkConnectFour(r, c);
-      if (isConnectFour === false)
-        break;
-      else if (isConnectFour === true)
-        return true;
-    }
-
-    //check right-bottom side
-    for (let c=playCol+1, r=playRow+1; (c<this.state.width && r<this.state.height); c++, r++) {
-      let isConnectFour = this.checkConnectFour(r, c);
-      if (isConnectFour === false)
-        break;
-      else if (isConnectFour === true)
-        return true;
-    }
-
-    return false;
-  }
-
-  /**
-   * This function checks for victory diagonally from top right to bottom left.
-   * The check is on the top right and bottom left side of the play
-   *
-   * @param playRow
-   * @param playCol
-   * @returns {boolean}
-   */
-  checkVictoryRightDia(playRow, playCol) {
-    this.resetWinningCells(playRow, playCol);
-
-    //check right-top side
-    for (let c=playCol+1, r=playRow-1; (c<this.state.width && r>=0); c++, r--) {
-      let isConnectFour = this.checkConnectFour(r, c);
-      if (isConnectFour === false)
-        break;
-      else if (isConnectFour === true)
-        return true;
-    }
-
-    //check left-bottom side
-    for (let c=playCol-1, r=playRow+1; (c>=0 && r<this.state.height); c--, r++) {
-      let isConnectFour = this.checkConnectFour(r, c);
-      if (isConnectFour === false)
-        break;
-      else if (isConnectFour === true)
-        return true;
-    }
-
-    return false;
-  }
+  };
 
   /**
    * This function starts a new game by initializing all the state variables
