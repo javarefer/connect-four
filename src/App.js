@@ -1,6 +1,6 @@
 /**
  * Connect Four Game for 2 players
- * Version 1.0
+ * Version 1.1
  * Author: Rahul Sapkal (rahul@javareference.com)
  * Copyright 2019
  * ---------------------------------------------------
@@ -38,15 +38,23 @@ import './App.css';
  */
 class App extends React.Component{
 
-  victoryDirection = {
-    down_vertical: {rowMod: 1, colMod: 0},
-    right_horizontal: {rowMod: 0, colMod: 1},
-    left_horizontal: {rowMod: 0, colMod: -1},
-    bottom_right_diagonal: {rowMod: 1, colMod: 1},
-    top_left_diagonal: {rowMod: -1, colMod: -1},
-    top_right_diagonal: {rowMod: -1, colMod: 1},
-    bottom_left_diagonal: {rowMod: 1, colMod: -1}
-  };
+  victoryDirection = [
+    [                           //vertical
+      {rowMod: 1, colMod: 0}    //down vertical
+    ],
+    [                           //horizontal
+      {rowMod: 0, colMod: -1},  //left horizontal
+      {rowMod: 0, colMod: 1}    //right horizontal
+    ],
+    [                           //diagonal top-left - bottom-right
+      {rowMod: -1, colMod: -1}, //top-left diagonal
+      {rowMod: 1, colMod: 1}    //bottom-right diagonal
+    ],
+    [                           //diagonal top-right - bottom-left
+      {rowMod: -1, colMod: 1},  //top-right diagonal
+      {rowMod: 1, colMod: -1}   //bottom-left diagonal
+    ]
+  ];
 
   winningCells = [];
 
@@ -242,7 +250,6 @@ class App extends React.Component{
    * @returns {boolean|undefined}
    */
   checkConnectFour = (playRow, playCol) => {
-    console.log(playRow + "   " + playCol);
     let value = this.state.board[playRow][playCol];
 
     if ((value === 0) || ((value > 0) && (this.state.currentPlayer !== value))) {
@@ -265,48 +272,42 @@ class App extends React.Component{
    * @returns {boolean}
    */
   checkVictoryForPlay (playRow, playCol) {
-    return (this.checkVictory(playRow, playCol, true)(this.victoryDirection.down_vertical) ||
-        this.checkVictory(playRow, playCol, true)(this.victoryDirection.left_horizontal) ||
-        this.checkVictory(playRow, playCol)(this.victoryDirection.right_horizontal) ||
-        this.checkVictory(playRow, playCol, true)(this.victoryDirection.top_left_diagonal) ||
-        this.checkVictory(playRow, playCol)(this.victoryDirection.bottom_right_diagonal) ||
-        this.checkVictory(playRow, playCol, true)(this.victoryDirection.top_right_diagonal) ||
-        this.checkVictory(playRow, playCol)(this.victoryDirection.bottom_left_diagonal)
-    );
+    for(let dirIndex=0; dirIndex<this.victoryDirection.length; dirIndex++) {
+      //Reset winning cells
+      this.winningCells = [{row: playRow, col: playCol}];
+
+      for(let subDirIndex=0; subDirIndex<this.victoryDirection[dirIndex].length; subDirIndex++) {
+        if(this.checkVictory(playRow, playCol, this.victoryDirection[dirIndex][subDirIndex]))
+          return true;
+      }
+    }
+    return false;
   }
 
   /**
-   * This function returns a function that checks for the victory
-   * in given direction
+   * This function checks victory in a given direction
    *
    * @param playRow
    * @param playCol
-   * @param resetCells
-   * @returns {function(...[*]=)}
+   * @param direction
+   * @returns {boolean}
    */
-  checkVictory = (playRow, playCol, resetWinningCells) => {
-    if (resetWinningCells) {
-      //Reset winning cells
-      this.winningCells = [{row: playRow, col: playCol}];
-    }
-
-    return (direction) => {
-      for (let r=playRow+direction.rowMod, c=playCol+direction.colMod; ; r+=direction.rowMod, c+=direction.colMod) {
-        if(((direction.rowMod === 1) && (r>=this.state.height)) ||
-           ((direction.rowMod === -1) && (r<0)) ||
-           ((direction.colMod === 1) && (c>=this.state.width)) ||
-           ((direction.colMod === -1) && (c<0))) {
-          break;
-        }
-
-        let isConnectFour = this.checkConnectFour(r, c);
-        if (isConnectFour === false)
-          break;
-        else if (isConnectFour === true)
-          return true;
+  checkVictory = (playRow, playCol, direction) => {
+    for (let r=playRow+direction.rowMod, c=playCol+direction.colMod; ; r+=direction.rowMod, c+=direction.colMod) {
+      if(((direction.rowMod === 1) && (r>=this.state.height)) ||
+         ((direction.rowMod === -1) && (r<0)) ||
+         ((direction.colMod === 1) && (c>=this.state.width)) ||
+         ((direction.colMod === -1) && (c<0))) {
+        break;
       }
-      return false;
+
+      let isConnectFour = this.checkConnectFour(r, c);
+      if (isConnectFour === false)
+        break;
+      else if (isConnectFour === true)
+        return true;
     }
+    return false;
   };
 
   /**
