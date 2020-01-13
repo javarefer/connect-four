@@ -76,7 +76,7 @@ class App extends React.Component{
       height: 6,
       width: 7,
       playInProgress: false,
-      themes: ['Light', 'Dark'],
+      themes: ['Dark', 'Light'],
       currentTheme: 0,
     };
   }
@@ -163,7 +163,7 @@ class App extends React.Component{
 
       this.setState({board: board});
 
-      setTimeout(()=>this.visualizePlay(playRow, playCol, ++rowIndex), 100);
+      setTimeout(()=>this.visualizePlay(playRow, playCol, ++rowIndex), 80);
     }
     else {
       this.processPlay(playRow, playCol);
@@ -329,18 +329,18 @@ class App extends React.Component{
    * Toggle Game Theme from Dark to Light
    */
   changeTheme = () => {
-    if(this.state.currentTheme === 0) {
+    if(this.state.currentTheme === 1) {
       document.body.style.backgroundColor = 'white';
       document.body.style.color = 'black';
 
-      this.setState({currentTheme : 1});
+      this.setState({currentTheme : 0});
     }
     else
     {
       document.body.style.backgroundColor = 'black';
       document.body.style.color = 'white';
 
-      this.setState({currentTheme : 0});
+      this.setState({currentTheme : 1});
     }
   };
 
