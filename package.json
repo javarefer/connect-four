@@ -1,6 +1,7 @@
 {
   "name": "connectfour",
   "version": "0.1.0",
+  "homepage": "https://javarefer.github.io/connect-four",
   "private": true,
   "dependencies": {
     "@testing-library/jest-dom": "^4.2.4",
@@ -12,6 +13,8 @@
     "serve": "^11.2.0"
   },
   "scripts": {
+    "predeploy": "npm run build",
++   "deploy": "gh-pages -d build",
     "dev": "react-scripts start",
     "start": "serve -s build",
     "build": "react-scripts build",
@@ -33,5 +36,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "gh-pages": "^5.0.0"
   }
 }
